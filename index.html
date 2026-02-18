@@ -1,0 +1,606 @@
+﻿<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Picofly Blinkcode-Decoder</title>
+  <style>
+    :root {
+      --bg: #0b1220;
+      --bg-2: #121b2d;
+      --card: #131d31cc;
+      --panel: #17243a;
+      --text: #e6edf7;
+      --muted: #a5b3c9;
+      --accent: #2f8f88;
+      --accent-2: #36a69d;
+      --border: #2b3a55;
+      --ok: #63d486;
+      --warn: #f1b96c;
+      --info: #79a9ff;
+      --chip: #23324c;
+      --chip-on: #2c3e5d;
+      --code-bg: #13233c;
+      --th-bg: #1b2a44;
+      --td-bg: #13233a;
+      --code-inline-bg: #253652;
+      --code-inline-border: #3a4d70;
+    }
+
+    body.light {
+      --bg: #edf2f8;
+      --bg-2: #f7f9fc;
+      --card: #ffffffee;
+      --panel: #f8fbff;
+      --text: #1f2937;
+      --muted: #5f6e84;
+      --accent: #197f78;
+      --accent-2: #1f938a;
+      --border: #d2ddeb;
+      --ok: #166534;
+      --warn: #9a5f11;
+      --info: #1d4ed8;
+      --chip: #e9eff8;
+      --chip-on: #cfdcf0;
+      --code-bg: #f8fbff;
+      --th-bg: #e7eff9;
+      --td-bg: #fdfefe;
+      --code-inline-bg: #e9f0f8;
+      --code-inline-border: #cad8ea;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Tahoma, sans-serif;
+      background: linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 100%);
+      color: var(--text);
+      min-height: 100vh;
+      display: grid;
+      place-items: start center;
+      padding: 24px;
+    }
+
+    .app {
+      width: min(940px, 100%);
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 20px;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 20px 60px rgba(2, 8, 20, 0.25);
+    }
+
+    .topbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .toggle-group {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .toggle-label {
+      font-size: 0.88rem;
+      color: var(--muted);
+      margin-right: 2px;
+    }
+
+    h1 {
+      margin: 0 0 6px;
+      font-size: clamp(1.25rem, 2.4vw, 1.75rem);
+    }
+
+    p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .panel {
+      margin-top: 16px;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--panel);
+    }
+
+    .panel h2 {
+      margin: 0 0 8px;
+      font-size: 1rem;
+      color: var(--text);
+    }
+
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    button {
+      border: 1px solid transparent;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 0.96rem;
+      cursor: pointer;
+      font-weight: 600;
+      transition: filter 120ms ease, transform 120ms ease, box-shadow 120ms ease;
+    }
+
+    button:hover {
+      filter: brightness(1.05);
+      transform: translateY(-1px);
+    }
+
+    .chip {
+      background: var(--chip);
+      color: var(--text);
+      border: 1px solid var(--border);
+      min-width: 120px;
+    }
+
+    .chip.active {
+      background: linear-gradient(180deg, #32486c 0%, var(--chip-on) 100%);
+      color: #fff;
+      border-color: #4e668d;
+      box-shadow: 0 0 0 2px rgba(121, 169, 255, 0.18);
+    }
+
+    body.light .chip.active {
+      background: linear-gradient(180deg, #7ca1d4 0%, #5f85bd 100%);
+      border-color: #5b84bf;
+      box-shadow: 0 0 0 2px rgba(91, 132, 191, 0.18);
+    }
+
+    .chip[data-color="yellow"] { border-color: #8a7036; }
+    .chip[data-color="yellow"].active {
+      background: linear-gradient(180deg, #b79645 0%, #8b7133 100%);
+      border-color: #d4b971;
+      box-shadow: 0 0 0 2px rgba(212, 185, 113, 0.24);
+    }
+
+    .chip[data-color="blue"] { border-color: #2f4f84; }
+    .chip[data-color="blue"].active {
+      background: linear-gradient(180deg, #4d7fd3 0%, #335a99 100%);
+      border-color: #7ea5e3;
+      box-shadow: 0 0 0 2px rgba(126, 165, 227, 0.24);
+    }
+
+    .chip[data-color="white"] { border-color: #617089; }
+    .chip[data-color="white"].active {
+      background: linear-gradient(180deg, #d6dfec 0%, #b8c4d7 100%);
+      color: #1b2639;
+      border-color: #e8eef8;
+      box-shadow: 0 0 0 2px rgba(232, 238, 248, 0.22);
+    }
+
+    .pulse {
+      background: linear-gradient(180deg, #37a49b 0%, var(--accent) 100%);
+      color: #fff;
+      min-width: 170px;
+      font-size: 1rem;
+      padding: 12px 14px;
+      border-color: #3cb7ac;
+    }
+
+    .action {
+      background: #2a3852;
+      color: #fff;
+      min-width: 120px;
+      border-color: #3a4a68;
+    }
+
+    body.light .action {
+      background: #4e647f;
+      border-color: #5c7698;
+    }
+
+    .action.primary {
+      background: linear-gradient(180deg, #3eb7ad 0%, var(--accent-2) 100%);
+      border-color: #59cec4;
+    }
+
+    .code-display {
+      margin-top: 10px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px dashed #516487;
+      background: var(--code-bg);
+      font-size: 1.05rem;
+    }
+
+    .result {
+      margin-top: 14px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+      background: var(--td-bg);
+    }
+
+    .result strong { display: block; margin-bottom: 6px; }
+
+    .msg-ok { color: var(--ok); }
+    .msg-warn { color: var(--warn); }
+    .msg-info { color: var(--info); }
+
+    table {
+      margin-top: 18px;
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+      overflow: hidden;
+      border-radius: 10px;
+    }
+
+    th, td {
+      border: 1px solid var(--border);
+      padding: 8px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th { background: var(--th-bg); color: var(--text); }
+    td { background: var(--td-bg); }
+
+    .hint {
+      margin-top: 10px;
+      font-size: 0.9rem;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      background: var(--panel);
+      padding: 10px;
+      border-radius: 10px;
+    }
+
+    @media (max-width: 680px) {
+      .pulse, .action, .chip { min-width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <div class="topbar">
+      <div class="toggle-group" id="themeButtons">
+        <span class="toggle-label" id="themeLabel">Theme</span>
+        <button class="chip" data-theme="day" type="button">Day</button>
+        <button class="chip active" data-theme="night" type="button">Night</button>
+      </div>
+      <div class="toggle-group" id="langButtons">
+        <span class="toggle-label" id="langLabel">Sprache</span>
+        <button class="chip active" data-lang="de" type="button">Deutsch</button>
+        <button class="chip" data-lang="en" type="button">English</button>
+      </div>
+    </div>
+
+    <h1 id="title">Picofly Blinkcode-Decoder</h1>
+    <p id="subtitle">Firmware 2.70+: Blau = Glitching, Weiss = Flashing, Gelb = Error-Code.</p>
+
+    <section class="panel">
+      <h2 id="colorTitle">1) Farbe auswaehlen</h2>
+      <div class="row" id="colorButtons">
+        <button class="chip" data-color="unknown" type="button" id="colorUnknown">None</button>
+        <button class="chip active" data-color="yellow" type="button" id="colorYellow">Gelb (Error)</button>
+        <button class="chip" data-color="blue" type="button" id="colorBlue">Blau (Glitching)</button>
+        <button class="chip" data-color="white" type="button" id="colorWhite">Weiss (Flashing)</button>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2 id="patternTitle">2) Blinkmuster per Buttons eingeben</h2>
+      <div class="row">
+        <button class="pulse" id="addLong" type="button">Lang (=)</button>
+        <button class="pulse" id="addShort" type="button">Kurz (*)</button>
+        <button class="action" id="backspace" type="button">Zurueck</button>
+        <button class="action" id="clearCode" type="button">Loeschen</button>
+        <button class="action primary" id="decodeBtn" type="button">Auswerten</button>
+      </div>
+      <div class="code-display"><span id="codePrefix">Aktueller Code:</span> <strong id="patternText">(leer)</strong></div>
+    </section>
+
+    <div id="result" class="result">
+      <strong id="resultTitle">Ergebnis</strong>
+      <span id="resultBody">Waehle Farbe und tippe dann auf Lang/Kurz.</span>
+    </div>
+
+    <p class="hint" id="conflictHint">README listet zusaetzlich "==" als eMMC write failure. In der ausfuehrlicheren Guide-Liste wird dafuer "=*=*" genutzt.</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th id="thCode">Code</th>
+          <th id="thMeaning">Bedeutung</th>
+        </tr>
+      </thead>
+      <tbody id="codeTable"></tbody>
+    </table>
+  </main>
+
+  <script>
+    const codeMap = {
+      "*": { de: "Glitch erfolgreich (Boot sollte erfolgen)", en: "Glitch successful (console should boot)" },
+      "=": { de: "USB flashing done", en: "USB flashing done" },
+      "**": { de: "RST ist nicht verbunden", en: "RST is not connected" },
+      "*=": { de: "CMD ist nicht verbunden", en: "CMD is not connected" },
+      "=*": { de: "D0 ist nicht verbunden", en: "D0 is not connected" },
+      "==": { de: "CLK ist nicht verbunden", en: "CLK is not connected" },
+      "***": { de: "Keine eMMC CMD1-Antwort (moegliches eMMC-Problem)", en: "No eMMC CMD1 response (possible eMMC issue)" },
+      "**=": { de: "eMMC Block 1 read fehlgeschlagen", en: "eMMC Block 1 read failed" },
+      "*=*": { de: "eMMC Block 0 read fehlgeschlagen / eMMC-Init-Problem", en: "eMMC Block 0 read failed / eMMC init issue" },
+      "*==": { de: "Keine eMMC CMD1-Request (Wiring/CPU pruefen)", en: "No eMMC CMD1 request (check wiring/CPU)" },
+      "=**": { de: "eMMC-Init-Fehler waehrend Glitch-Prozess", en: "eMMC init failure during glitch process" },
+      "=*=": { de: "CPU erreicht BCT-Check nie (sollte nicht passieren)", en: "CPU never reaches BCT check (should not happen)" },
+      "==*": { de: "CPU erreicht BCT-Check immer (keine Glitch-Reaktion, MOSFET pruefen)", en: "CPU always reaches BCT check (no glitch reaction, check MOSFET)" },
+      "===": { de: "Glitch-Versuchslimit erreicht, kein Glitch moeglich", en: "Glitch attempt limit reached, cannot glitch" },
+      "=***": { de: "eMMC-Init-Fehler", en: "eMMC init failure" },
+      "=**=": { de: "eMMC-Schreibfehler - Vergleich fehlgeschlagen", en: "eMMC write failure - comparison failed" },
+      "=*=*": { de: "eMMC-Schreibfehler - Schreiben fehlgeschlagen", en: "eMMC write failure - write failed" },
+      "=*==": { de: "eMMC-Testfehler - Lesen fehlgeschlagen", en: "eMMC test failure - read failed" },
+      "==**": { de: "eMMC-Lesen waehrend Firmware-Update fehlgeschlagen", en: "eMMC read failed during firmware update" },
+      "==*=": { de: "BCT-Kopie fehlgeschlagen - Schreibfehler", en: "BCT copy failed - write failure" },
+      "===*": { de: "BCT-Kopie fehlgeschlagen - Vergleichsfehler", en: "BCT copy failed - comparison failure" },
+      "====": { de: "BCT-Kopie fehlgeschlagen - Lesefehler", en: "BCT copy failed - read failure" }
+    };
+
+    const conflictHintText = {
+      de: 'README listet zusaetzlich "==" als eMMC write failure. In der ausfuehrlicheren Guide-Liste wird dafuer "=*=*" genutzt.',
+      en: 'README additionally lists "==" as eMMC write failure. The more detailed guide uses "=*=*" for that case.'
+    };
+
+    const ui = {
+      de: {
+        htmlLang: "de",
+        themeLabel: "Theme",
+        langLabel: "Sprache",
+        title: "Picofly Blinkcode-Decoder",
+        subtitle: "Firmware 2.70+: Blau = Glitching, Weiss = Flashing, Gelb = Error-Code.",
+        colorTitle: "1) Farbe auswaehlen",
+        patternTitle: "2) Blinkmuster per Buttons eingeben",
+        colors: { yellow: "Gelb (Error)", blue: "Blau (Glitching)", white: "Weiss (Flashing)", unknown: "None" },
+        addLong: "Lang (=)",
+        addShort: "Kurz (*)",
+        backspace: "Zurueck",
+        clear: "Loeschen",
+        decode: "Auswerten",
+        codePrefix: "Aktueller Code:",
+        emptyCode: "(leer)",
+        resultTitle: "Ergebnis",
+        initial: "Waehle Farbe und tippe dann auf Lang/Kurz.",
+        thCode: "Code",
+        thMeaning: "Bedeutung",
+        statusTitle: "Status",
+        statusBlue: "Blau bedeutet: Chip ist im Glitching-Prozess.",
+        statusWhite: "Weiss bedeutet: Firmware/USB-Flashing aktiv.",
+        colorHintTitle: "Farb-Hinweis",
+        colorHint: "Fehlercodes werden bei Firmware 2.70+ nur mit gelber LED ausgewertet. Bitte Farbe auf Gelb stellen.",
+        missingTitle: "Fehlende Eingabe",
+        missing: "Bitte zuerst ein Blinkmuster per Buttons eingeben.",
+        knownTitle: "Erkannt",
+        unknownTitle: "Unbekannter Code",
+        unknown: "Dieses Muster ist in der aktuellen Liste nicht enthalten."
+      },
+      en: {
+        htmlLang: "en",
+        themeLabel: "Theme",
+        langLabel: "Language",
+        title: "Picofly Blinkcode Decoder",
+        subtitle: "Firmware 2.70+: Blue = Glitching, White = Flashing, Yellow = Error code.",
+        colorTitle: "1) Select LED color",
+        patternTitle: "2) Enter blink pattern with buttons",
+        colors: { yellow: "Yellow (Error)", blue: "Blue (Glitching)", white: "White (Flashing)", unknown: "None" },
+        addLong: "Long (=)",
+        addShort: "Short (*)",
+        backspace: "Backspace",
+        clear: "Clear",
+        decode: "Decode",
+        codePrefix: "Current code:",
+        emptyCode: "(empty)",
+        resultTitle: "Result",
+        initial: "Select color, then tap Long/Short.",
+        thCode: "Code",
+        thMeaning: "Meaning",
+        statusTitle: "Status",
+        statusBlue: "Blue means: chip is in glitching process.",
+        statusWhite: "White means: firmware/USB flashing is active.",
+        colorHintTitle: "Color hint",
+        colorHint: "On firmware 2.70+, error codes are only decoded with yellow LED. Please switch to yellow.",
+        missingTitle: "Missing input",
+        missing: "Please enter a blink pattern using the buttons.",
+        knownTitle: "Detected",
+        unknownTitle: "Unknown code",
+        unknown: "This pattern is not in the current list."
+      }
+    };
+
+    const tableBody = document.getElementById("codeTable");
+    const result = document.getElementById("result");
+    const patternText = document.getElementById("patternText");
+    const colorButtons = [...document.querySelectorAll("#colorButtons .chip")];
+    const langButtons = [...document.querySelectorAll("#langButtons .chip")];
+    const themeButtons = [...document.querySelectorAll("#themeButtons .chip")];
+    const storageKeys = {
+      lang: "picofly_lang",
+      theme: "picofly_theme"
+    };
+
+    let selectedColor = "yellow";
+    let pattern = "";
+    let lang = "de";
+    let theme = "night";
+    let hasInteracted = false;
+
+    function t() {
+      return ui[lang];
+    }
+
+    function setResult(typeClass, title, message) {
+      result.innerHTML = `<strong class='${typeClass}'>${title}</strong>${message}`;
+    }
+
+    function setInitialResult() {
+      setResult("", t().resultTitle, t().initial);
+    }
+
+    function updatePatternView() {
+      patternText.textContent = pattern || t().emptyCode;
+    }
+
+    function setColor(color) {
+      selectedColor = color;
+      hasInteracted = true;
+      colorButtons.forEach((btn) => {
+        btn.classList.toggle("active", btn.dataset.color === color);
+      });
+    }
+
+    function fillTable() {
+      tableBody.innerHTML = "";
+      Object.entries(codeMap).forEach(([code, meaning]) => {
+        const row = document.createElement("tr");
+        const codeCell = document.createElement("td");
+        const meaningCell = document.createElement("td");
+        codeCell.textContent = code;
+        meaningCell.textContent = meaning[lang];
+        row.appendChild(codeCell);
+        row.appendChild(meaningCell);
+        tableBody.appendChild(row);
+      });
+    }
+
+    function applyLanguage() {
+      const tx = t();
+      document.documentElement.lang = tx.htmlLang;
+      document.title = tx.title;
+      document.getElementById("themeLabel").textContent = tx.themeLabel;
+      document.getElementById("langLabel").textContent = tx.langLabel;
+      document.getElementById("title").textContent = tx.title;
+      document.getElementById("subtitle").textContent = tx.subtitle;
+      document.getElementById("colorTitle").textContent = tx.colorTitle;
+      document.getElementById("patternTitle").textContent = tx.patternTitle;
+      document.getElementById("colorYellow").textContent = tx.colors.yellow;
+      document.getElementById("colorBlue").textContent = tx.colors.blue;
+      document.getElementById("colorWhite").textContent = tx.colors.white;
+      document.getElementById("colorUnknown").textContent = tx.colors.unknown;
+      document.getElementById("addLong").textContent = tx.addLong;
+      document.getElementById("addShort").textContent = tx.addShort;
+      document.getElementById("backspace").textContent = tx.backspace;
+      document.getElementById("clearCode").textContent = tx.clear;
+      document.getElementById("decodeBtn").textContent = tx.decode;
+      document.getElementById("codePrefix").textContent = tx.codePrefix;
+      document.getElementById("thCode").textContent = tx.thCode;
+      document.getElementById("thMeaning").textContent = tx.thMeaning;
+      document.getElementById("conflictHint").textContent = conflictHintText[lang];
+      updatePatternView();
+      fillTable();
+      if (hasInteracted) {
+        decode();
+      } else {
+        setInitialResult();
+      }
+    }
+
+    function decode() {
+      const tx = t();
+
+      if (!pattern && (selectedColor === "blue" || selectedColor === "white")) {
+        if (selectedColor === "blue") {
+          setResult("msg-info", tx.statusTitle, tx.statusBlue);
+          return;
+        }
+        setResult("msg-info", tx.statusTitle, tx.statusWhite);
+        return;
+      }
+
+      if (selectedColor === "blue" || selectedColor === "white") {
+        setResult("msg-warn", tx.colorHintTitle, tx.colorHint);
+        return;
+      }
+
+      if (!pattern) {
+        setResult("msg-warn", tx.missingTitle, tx.missing);
+        return;
+      }
+
+      const match = codeMap[pattern];
+      if (match) {
+        setResult("msg-ok", `${tx.knownTitle}: ${pattern}`, match[lang]);
+      } else {
+        setResult("msg-warn", tx.unknownTitle, tx.unknown);
+      }
+    }
+
+    function applyTheme(mode, persist = true) {
+      theme = mode === "day" ? "day" : "night";
+      document.body.classList.toggle("light", theme === "day");
+      themeButtons.forEach((x) => x.classList.toggle("active", x.dataset.theme === theme));
+      if (persist) {
+        localStorage.setItem(storageKeys.theme, theme);
+      }
+    }
+
+    function setLanguage(newLang, persist = true) {
+      lang = newLang === "en" ? "en" : "de";
+      langButtons.forEach((x) => x.classList.toggle("active", x.dataset.lang === lang));
+      applyLanguage();
+      if (persist) {
+        localStorage.setItem(storageKeys.lang, lang);
+      }
+    }
+
+    document.getElementById("addLong").addEventListener("click", () => {
+      hasInteracted = true;
+      pattern += "=";
+      updatePatternView();
+    });
+
+    document.getElementById("addShort").addEventListener("click", () => {
+      hasInteracted = true;
+      pattern += "*";
+      updatePatternView();
+    });
+
+    document.getElementById("backspace").addEventListener("click", () => {
+      hasInteracted = true;
+      pattern = pattern.slice(0, -1);
+      updatePatternView();
+    });
+
+    document.getElementById("clearCode").addEventListener("click", () => {
+      hasInteracted = true;
+      pattern = "";
+      updatePatternView();
+    });
+
+    document.getElementById("decodeBtn").addEventListener("click", () => {
+      hasInteracted = true;
+      decode();
+    });
+
+    colorButtons.forEach((btn) => {
+      btn.addEventListener("click", () => setColor(btn.dataset.color));
+    });
+
+    langButtons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        setLanguage(btn.dataset.lang);
+      });
+    });
+
+    themeButtons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        applyTheme(btn.dataset.theme);
+      });
+    });
+
+    const savedLang = localStorage.getItem(storageKeys.lang);
+    const savedTheme = localStorage.getItem(storageKeys.theme);
+    applyTheme(savedTheme, false);
+    setLanguage(savedLang, false);
+  </script>
+</body>
+</html>
