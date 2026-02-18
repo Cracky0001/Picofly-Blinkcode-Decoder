@@ -229,25 +229,6 @@
     .msg-warn { color: var(--warn); }
     .msg-info { color: var(--info); }
 
-    table {
-      margin-top: 18px;
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.95rem;
-      overflow: hidden;
-      border-radius: 10px;
-    }
-
-    th, td {
-      border: 1px solid var(--border);
-      padding: 8px;
-      text-align: left;
-      vertical-align: top;
-    }
-
-    th { background: var(--th-bg); color: var(--text); }
-    td { background: var(--td-bg); }
-
     .hint {
       margin-top: 10px;
       font-size: 0.9rem;
@@ -302,23 +283,6 @@
       </div>
       <div class="code-display"><span id="codePrefix">Aktueller Code:</span> <strong id="patternText">(leer)</strong></div>
     </section>
-
-    <div id="result" class="result">
-      <strong id="resultTitle">Ergebnis</strong>
-      <span id="resultBody">Waehle Farbe und tippe dann auf Lang/Kurz.</span>
-    </div>
-
-    <p class="hint" id="conflictHint">"==" als eMMC write failure. In der ausfuehrlicheren Guide-Liste wird dafuer "=*=*" genutzt.</p>
-
-    <table>
-      <thead>
-        <tr>
-          <th id="thCode">Code</th>
-          <th id="thMeaning">Bedeutung</th>
-        </tr>
-      </thead>
-      <tbody id="codeTable"></tbody>
-    </table>
   </main>
 
   <script>
@@ -347,11 +311,6 @@
       "====": { de: "BCT-Kopie fehlgeschlagen - Lesefehler", en: "BCT copy failed - read failure" }
     };
 
-    const conflictHintText = {
-      de: 'listet zusaetzlich "==" als eMMC write failure. In der ausfuehrlicheren Guide-Liste wird dafuer "=*=*" genutzt.',
-      en: 'additionally lists "==" as eMMC write failure. The more detailed guide uses "=*=*" for that case.'
-    };
-
     const ui = {
       de: {
         htmlLang: "de",
@@ -371,8 +330,6 @@
         emptyCode: "(leer)",
         resultTitle: "Ergebnis",
         initial: "Waehle Farbe und tippe dann auf Lang/Kurz.",
-        thCode: "Code",
-        thMeaning: "Bedeutung",
         statusTitle: "Status",
         statusBlue: "Blau bedeutet: Chip ist im Glitching-Prozess.",
         statusWhite: "Weiss bedeutet: Firmware/USB-Flashing aktiv.",
@@ -402,8 +359,6 @@
         emptyCode: "(empty)",
         resultTitle: "Result",
         initial: "Select color, then tap Long/Short.",
-        thCode: "Code",
-        thMeaning: "Meaning",
         statusTitle: "Status",
         statusBlue: "Blue means: chip is in glitching process.",
         statusWhite: "White means: firmware/USB flashing is active.",
@@ -417,7 +372,6 @@
       }
     };
 
-    const tableBody = document.getElementById("codeTable");
     const result = document.getElementById("result");
     const patternText = document.getElementById("patternText");
     const colorButtons = [...document.querySelectorAll("#colorButtons .chip")];
@@ -458,20 +412,6 @@
       });
     }
 
-    function fillTable() {
-      tableBody.innerHTML = "";
-      Object.entries(codeMap).forEach(([code, meaning]) => {
-        const row = document.createElement("tr");
-        const codeCell = document.createElement("td");
-        const meaningCell = document.createElement("td");
-        codeCell.textContent = code;
-        meaningCell.textContent = meaning[lang];
-        row.appendChild(codeCell);
-        row.appendChild(meaningCell);
-        tableBody.appendChild(row);
-      });
-    }
-
     function applyLanguage() {
       const tx = t();
       document.documentElement.lang = tx.htmlLang;
@@ -492,11 +432,8 @@
       document.getElementById("clearCode").textContent = tx.clear;
       document.getElementById("decodeBtn").textContent = tx.decode;
       document.getElementById("codePrefix").textContent = tx.codePrefix;
-      document.getElementById("thCode").textContent = tx.thCode;
-      document.getElementById("thMeaning").textContent = tx.thMeaning;
       document.getElementById("conflictHint").textContent = conflictHintText[lang];
       updatePatternView();
-      fillTable();
       if (hasInteracted) {
         decode();
       } else {
