@@ -21,10 +21,7 @@
       --chip: #23324c;
       --chip-on: #2c3e5d;
       --code-bg: #13233c;
-      --th-bg: #1b2a44;
       --td-bg: #13233a;
-      --code-inline-bg: #253652;
-      --code-inline-border: #3a4d70;
     }
 
     body.light {
@@ -43,10 +40,7 @@
       --chip: #e9eff8;
       --chip-on: #cfdcf0;
       --code-bg: #f8fbff;
-      --th-bg: #e7eff9;
       --td-bg: #fdfefe;
-      --code-inline-bg: #e9f0f8;
-      --code-inline-border: #cad8ea;
     }
 
     * { box-sizing: border-box; }
@@ -228,16 +222,6 @@
     .msg-ok { color: var(--ok); }
     .msg-warn { color: var(--warn); }
     .msg-info { color: var(--info); }
-
-    .hint {
-      margin-top: 10px;
-      font-size: 0.9rem;
-      color: var(--muted);
-      border: 1px solid var(--border);
-      background: var(--panel);
-      padding: 10px;
-      border-radius: 10px;
-    }
 
     @media (max-width: 680px) {
       .pulse, .action, .chip { min-width: 100%; }
@@ -440,7 +424,6 @@
       document.getElementById("clearCode").textContent = tx.clear;
       document.getElementById("decodeBtn").textContent = tx.decode;
       document.getElementById("codePrefix").textContent = tx.codePrefix;
-      document.getElementById("conflictHint").textContent = conflictHintText[lang];
       updatePatternView();
       if (hasInteracted) {
         decode();
