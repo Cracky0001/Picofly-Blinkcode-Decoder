@@ -283,6 +283,14 @@
       </div>
       <div class="code-display"><span id="codePrefix">Aktueller Code:</span> <strong id="patternText">(leer)</strong></div>
     </section>
+
+    <div id="result" class="result">
+      <strong id="resultTitle">Ergebnis</strong>
+      <span id="resultBody">Waehle Farbe und tippe dann auf Lang/Kurz.</span>
+    </div>
+
+    <p class="hint" id="conflictHint">"==" als eMMC write failure. In der ausfuehrlicheren Guide-Liste wird dafuer "=*=*" genutzt.</p>
+
   </main>
 
   <script>
@@ -310,6 +318,8 @@
       "===*": { de: "BCT-Kopie fehlgeschlagen - Vergleichsfehler", en: "BCT copy failed - comparison failure" },
       "====": { de: "BCT-Kopie fehlgeschlagen - Lesefehler", en: "BCT copy failed - read failure" }
     };
+
+
 
     const ui = {
       de: {
