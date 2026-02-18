@@ -244,15 +244,15 @@
     </div>
 
     <h1 id="title">Picofly Blinkcode-Decoder</h1>
-    <p id="subtitle">Firmware 2.70+: Blau = Glitching, Weiss = Flashing, Gelb = Error-Code.</p>
+    <p id="subtitle">Firmware 2.70+: Blau = Glitching, Weiß = Flashing, Gelb = Error-Code.</p>
 
     <section class="panel">
-      <h2 id="colorTitle">1) Farbe auswaehlen</h2>
+      <h2 id="colorTitle">1) Farbe auswählen</h2>
       <div class="row" id="colorButtons">
         <button class="chip" data-color="unknown" type="button" id="colorUnknown">None</button>
         <button class="chip active" data-color="yellow" type="button" id="colorYellow">Gelb (Error)</button>
         <button class="chip" data-color="blue" type="button" id="colorBlue">Blau (Glitching)</button>
-        <button class="chip" data-color="white" type="button" id="colorWhite">Weiss (Flashing)</button>
+        <button class="chip" data-color="white" type="button" id="colorWhite">Weiß (Flashing)</button>
       </div>
     </section>
 
@@ -261,8 +261,8 @@
       <div class="row">
         <button class="pulse" id="addLong" type="button">Lang (=)</button>
         <button class="pulse" id="addShort" type="button">Kurz (*)</button>
-        <button class="action" id="backspace" type="button">Zurueck</button>
-        <button class="action" id="clearCode" type="button">Loeschen</button>
+        <button class="action" id="backspace" type="button">Zurück</button>
+        <button class="action" id="clearCode" type="button">Löschen</button>
         <button class="action primary" id="decodeBtn" type="button">Auswerten</button>
       </div>
       <div class="code-display"><span id="codePrefix">Aktueller Code:</span> <strong id="patternText">(leer)</strong></div>
@@ -270,7 +270,7 @@
 
     <div id="result" class="result">
       <strong id="resultTitle">Ergebnis</strong>
-      <span id="resultBody">Waehle Farbe und tippe dann auf Lang/Kurz.</span>
+      <span id="resultBody">Wähle Farbe und tippe dann auf Lang/Kurz.</span>
     </div>
 
   </main>
@@ -283,19 +283,19 @@
       "*=": { de: "CMD ist nicht verbunden", en: "CMD is not connected" },
       "=*": { de: "D0 ist nicht verbunden", en: "D0 is not connected" },
       "==": { de: "CLK ist nicht verbunden", en: "CLK is not connected" },
-      "***": { de: "Keine eMMC CMD1-Antwort (moegliches eMMC-Problem)", en: "No eMMC CMD1 response (possible eMMC issue)" },
+      "***": { de: "Keine eMMC CMD1-Antwort (mögliches eMMC-Problem)", en: "No eMMC CMD1 response (possible eMMC issue)" },
       "**=": { de: "eMMC Block 1 read fehlgeschlagen", en: "eMMC Block 1 read failed" },
       "*=*": { de: "eMMC Block 0 read fehlgeschlagen / eMMC-Init-Problem", en: "eMMC Block 0 read failed / eMMC init issue" },
-      "*==": { de: "Keine eMMC CMD1-Request (Wiring/CPU pruefen)", en: "No eMMC CMD1 request (check wiring/CPU)" },
-      "=**": { de: "eMMC-Init-Fehler waehrend Glitch-Prozess", en: "eMMC init failure during glitch process" },
+      "*==": { de: "Keine eMMC CMD1-Request (Wiring/CPU prüfen)", en: "No eMMC CMD1 request (check wiring/CPU)" },
+      "=**": { de: "eMMC-Init-Fehler während Glitch-Prozess", en: "eMMC init failure during glitch process" },
       "=*=": { de: "CPU erreicht BCT-Check nie (sollte nicht passieren)", en: "CPU never reaches BCT check (should not happen)" },
-      "==*": { de: "CPU erreicht BCT-Check immer (keine Glitch-Reaktion, MOSFET pruefen)", en: "CPU always reaches BCT check (no glitch reaction, check MOSFET)" },
-      "===": { de: "Glitch-Versuchslimit erreicht, kein Glitch moeglich", en: "Glitch attempt limit reached, cannot glitch" },
+      "==*": { de: "CPU erreicht BCT-Check immer (keine Glitch-Reaktion, MOSFET prüfen)", en: "CPU always reaches BCT check (no glitch reaction, check MOSFET)" },
+      "===": { de: "Glitch-Versuchslimit erreicht, kein Glitch möglich", en: "Glitch attempt limit reached, cannot glitch" },
       "=***": { de: "eMMC-Init-Fehler", en: "eMMC init failure" },
       "=**=": { de: "eMMC-Schreibfehler - Vergleich fehlgeschlagen", en: "eMMC write failure - comparison failed" },
       "=*=*": { de: "eMMC-Schreibfehler - Schreiben fehlgeschlagen", en: "eMMC write failure - write failed" },
       "=*==": { de: "eMMC-Testfehler - Lesen fehlgeschlagen", en: "eMMC test failure - read failed" },
-      "==**": { de: "eMMC-Lesen waehrend Firmware-Update fehlgeschlagen", en: "eMMC read failed during firmware update" },
+      "==**": { de: "eMMC-Lesen während Firmware-Update fehlgeschlagen", en: "eMMC read failed during firmware update" },
       "==*=": { de: "BCT-Kopie fehlgeschlagen - Schreibfehler", en: "BCT copy failed - write failure" },
       "===*": { de: "BCT-Kopie fehlgeschlagen - Vergleichsfehler", en: "BCT copy failed - comparison failure" },
       "====": { de: "BCT-Kopie fehlgeschlagen - Lesefehler", en: "BCT copy failed - read failure" }
@@ -309,22 +309,22 @@
         themeLabel: "Theme",
         langLabel: "Sprache",
         title: "Picofly Blinkcode-Decoder",
-        subtitle: "Firmware 2.70+: Blau = Glitching, Weiss = Flashing, Gelb = Error-Code.",
-        colorTitle: "1) Farbe auswaehlen",
+        subtitle: "Firmware 2.70+: Blau = Glitching, Weiß = Flashing, Gelb = Error-Code.",
+        colorTitle: "1) Farbe auswählen",
         patternTitle: "2) Blinkmuster per Buttons eingeben",
-        colors: { yellow: "Gelb (Error)", blue: "Blau (Glitching)", white: "Weiss (Flashing)", unknown: "None" },
+        colors: { yellow: "Gelb (Error)", blue: "Blau (Glitching)", white: "Weiß (Flashing)", unknown: "None" },
         addLong: "Lang (=)",
         addShort: "Kurz (*)",
-        backspace: "Zurueck",
-        clear: "Loeschen",
+        backspace: "Zurück",
+        clear: "Löschen",
         decode: "Auswerten",
         codePrefix: "Aktueller Code:",
         emptyCode: "(leer)",
         resultTitle: "Ergebnis",
-        initial: "Waehle Farbe und tippe dann auf Lang/Kurz.",
+        initial: "Wähle Farbe und tippe dann auf Lang/Kurz.",
         statusTitle: "Status",
         statusBlue: "Blau bedeutet: Chip ist im Glitching-Prozess.",
-        statusWhite: "Weiss bedeutet: Firmware/USB-Flashing aktiv.",
+        statusWhite: "Weiß bedeutet: Firmware/USB-Flashing aktiv.",
         colorHintTitle: "Farb-Hinweis",
         colorHint: "Fehlercodes werden bei Firmware 2.70+ nur mit gelber LED ausgewertet. Bitte Farbe auf Gelb stellen.",
         missingTitle: "Fehlende Eingabe",
